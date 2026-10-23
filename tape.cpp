@@ -66,7 +66,12 @@ string Tape::ToString() {
     }
 
     while (current != nullptr) {
-        result.append(current->symbol.GetName());
+        if (current == head) {
+            result.append("[" + current->symbol.GetName() + "]");
+        } else {
+            result.append(current->symbol.GetName());
+        }
+
         current = current->right;
     }
 
