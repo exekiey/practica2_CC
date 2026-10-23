@@ -138,7 +138,7 @@ bool Reader::ReadMachine() {
 		return false;
 	}
     if (ContainsEmpty(turingMachine.inputSymbols)) {
-        cerr << "Error: Σ contiene el símbolo vacío";
+        cerr << "Error: Σ contiene el símbolo vacío" << endl;;
 		cerr << "Línea: " << line << endl;
         return false;
     }
