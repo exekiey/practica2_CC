@@ -95,7 +95,7 @@ bool Solver::DoTransitions(vector<Tape>& tapes, State& currentState) {
     return false;
 }
 
-bool Solver::Solve(const std::vector<Symbol>& input, bool doTrace, string* result) {
+bool Solver::Solve(const std::vector<Symbol>& input, string* result) {
     State currentState = turingMachine.initialState;
     
     vector<Tape> tapes;

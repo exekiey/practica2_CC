@@ -12,12 +12,10 @@ bool ReadOptions(
     int argc,
     char* argv[],
     string& configFile,
-    string& inputFile,
-    bool& doTrace
+    string& inputFile
 ) {
     bool hasConfigFile = false;
     bool hasInputFile = false;
-    bool hasTraceOption = false;
 
     for (int i = 1; i < argc; ++i) {
         string argument = argv[i];
@@ -37,25 +35,6 @@ bool ReadOptions(
                 configFile = argv[++i];
                 hasConfigFile = true;
                 break;
-
-            case 't': {
-                if (argument != "-trace" || i + 1 >= argc) {
-                    cerr << "Argumento inválido: " << argument << endl;
-                    return false;
-                }
-
-                string traceOption = argv[++i];
-
-                if (traceOption != "y" && traceOption != "n") {
-                    cerr << "Error: -trace debe ser y o n." << endl;
-                    return false;
-                }
-
-                doTrace = (traceOption == "y");
-                hasTraceOption = true;
-                break;
-            }
-
             case 'i':
                 if (argument != "-in" || i + 1 >= argc) {
                     cerr << "Argumento inválido: " << argument << endl;
@@ -72,9 +51,9 @@ bool ReadOptions(
         }
     }
 
-    if (!hasConfigFile || !hasInputFile || !hasTraceOption) {
+    if (!hasConfigFile || !hasInputFile) {
         cerr << "Uso: " << argv[0]
-             << " -config <f> -trace <y|n> -in <f>"
+             << " -config <f> -in <f>"
              << endl;
         return false;
     }
@@ -117,9 +96,8 @@ void PrintMachine(TuringMachine& automaton) {
 int main(int argc, char* argv[]) {
     string configFile;
     string inputFile;
-    bool doTrace = false;
 
-    if (!ReadOptions(argc, argv, configFile, inputFile, doTrace)) {
+    if (!ReadOptions(argc, argv, configFile, inputFile)) {
         return 1;
     }
 
@@ -132,9 +110,7 @@ int main(int argc, char* argv[]) {
 
     TuringMachine turingMachine = reader.GetTuringMachine();
 
-    if (doTrace) {
-        PrintMachine(turingMachine);
-    }
+    PrintMachine(turingMachine);
 
     vector<vector<Symbol>> inputSymbolsList;
     if (!reader.ReadInputFile(turingMachine.inputSymbols, inputSymbolsList)) {
@@ -144,12 +120,14 @@ int main(int argc, char* argv[]) {
 
     Solver solver = Solver(turingMachine);
     for (vector<Symbol> symbolList : inputSymbolsList) {
+        cout << '"';
         for (Symbol symbol : symbolList) {
             cout << symbol.GetName();
         }
+        cout << '"';
         string result;
-        cout << (solver.Solve(symbolList, doTrace, &result) ? "Válida" : "Inválida");
-        cout << result;
+        cout << (solver.Solve(symbolList, &result) ? " Aceptada - " : " No Aceptada - ");
+        cout << "Resultado: " << result;
         cout << endl;
     }
 

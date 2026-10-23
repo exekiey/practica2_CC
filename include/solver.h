@@ -44,7 +44,7 @@ private:
 public:
     Solver(const TuringMachine& automaton);
 
-    bool Solve(const std::vector<Symbol>& input, bool doTrace, string* string);
+    bool Solve(const std::vector<Symbol>& input, string* string);
     void GenerateEpsilonNodes(Node& currentNode, std::queue<Node>& BFSqueue);
 };
 
