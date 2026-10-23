@@ -13,9 +13,10 @@ El proyecto incluye la definición y los grafos de las siguientes Máquinas de T
 
 1. Reconocimiento del lenguaje L = { a^n b^m | m >= n, n > 0 }
    - Fichero de configuración: ```turing_machines/Design1.txt```
-
+   ![MT1](turing_machines/Design1.png)
 2. Transformación de cadenas de a y b a recuento 1^n (con separador 0 en ausencia)
    - Fichero de configuración: ```turing_machines/Design2.txt```
+   ![MT1](turing_machines/Design2.png)
 
 ## Estructura del Proyecto
 
