@@ -1,162 +1,74 @@
-# Práctica 1 - Complejidad Computacional
+# Práctica 2 - Complejidad Computacional
 
-Este proyecto implementa un simulador de autómatas de pila (PDA, Pushdown Automata) en C++ para reconocer cadenas de entrada según una definición textual del autómata.
-
-El programa lee la especificación del autómata desde un archivo de texto, procesa una o varias cadenas desde otro archivo y determina si cada una es aceptada o rechazada.
-
-## Objetivo
-
-La práctica está enfocada en modelar y validar un autómata de pila que reconoce un lenguaje concreto mediante un recorrido por estados y pila, usando transiciones con lectura de entrada y expansión de la pila.
-
-El ejemplo incluido reconoce un lenguaje del tipo palíndromo con longitud par, definido en el archivo `automata.txt`:
-
-- `L = {ww^R}`
-- En la práctica, el ejemplo reconoce palabras palíndromas de longitud par.
+Este proyecto implementa un simulador de una Máquina de Turing determinista (multicinta) en C++, diseñado bajo principios de orientación a objetos. El programa lee la configuración de una Máquina de Turing desde un fichero de texto, procesa cadenas de entrada y determina si son aceptadas o rechazadas, mostrando la evolución de la cinta y la posición de la cabeza de lectura/escritura.
 
 ## Funcionalidades
 
-- Lectura de un autómata desde un archivo de texto.
-- Soporte de transiciones con símbolo de entrada y símbolo de cima de pila.
-- Soporte de transiciones epsilon representadas con `.`.
-- Simulación de la pila durante la ejecución.
-- Modo de traza opcional para ver la evolución del autómata.
-- Validación de múltiples cadenas desde un archivo de entrada.
+- Lectura y movimientos simultáneos
+- Movimientos: L, R y S
+- Cinta infinita en ambas direcciones
+## Máquinas de Turing diseñadas
 
-## Estructura del proyecto
+El proyecto incluye la definición y los grafos de las siguientes Máquinas de Turing:
 
-- `main.cpp`: punto de entrada del programa.
-- `include/`: encabezados (`.h`) del proyecto.
-- `reader.cpp`: lectura del autómata y del archivo de entrada.
-- `automaton.cpp`: definición del autómata.
-- `solver.cpp`: lógica de resolución del problema.
-- `state.cpp`: representación de estados.
-- `symbol.cpp`: representación de símbolos.
-- `transition.cpp`: definición de transiciones.
-- `node.cpp`: nodos del recorrido BFS.
-- `tools.cpp`: utilidades auxiliares.
-- `automata.txt`: ejemplo de autómata.
-- `input.txt`: ejemplo de cadenas de entrada.
-- `Makefile`: compilación del proyecto; guarda los archivos objeto en `build/`.
+1. Reconocimiento del lenguaje L = { a^n b^m | m >= n, n > 0 }
+   - Fichero de configuración: ```turing_machines/Design1.txt```
 
-## Formato del archivo del autómata
+2. Transformación de cadenas de a y b a recuento 1^n (con separador 0 en ausencia)
+   - Fichero de configuración: ```turing_machines/Design2.txt```
 
-El archivo del autómata sigue este esquema:
+## Estructura del Proyecto
 
-```text
-Q
-Σ
-Γ
-q0
-A0
-F
-transición_1
-transición_2
-...
+- main.cpp: Punto de entrada del programa y gestor de argumentos por línea de comandos.
+- include/: Carpeta contenedora de los archivos de cabecera (.h).
+- reader.cpp: Módulo de lectura y validación de la configuración de la MT y de los ficheros de entrada.
+- solver.cpp: Lógica de resolución y motor de ejecución de las transiciones de la máquina.
+- tape.cpp: Implementación de la cinta bidireccional infinita mediante estructura de nodos doblemente enlazados.
+- state.cpp: Representación formal de los estados de la máquina.
+- symbol.cpp: Representación de los símbolos del alfabeto y gestión del símbolo blanco.
+- transition.cpp: Definición formal de las funciones de transición.
+- tools.cpp: Funciones auxiliares de procesamiento de cadenas y tokens.
+- Makefile: Automatización de la compilación del proyecto (genera los objetos en build/).
+- automata.txt: Configuración de la MT para el Problema 1.
+- automata2.txt: Configuración de la MT para el Problema 2.
+- input.txt: Ejemplo de cadenas de entrada a comprobar.
+
+
+## Formato del Fichero de Configuración
+
+El archivo de configuración sigue la estructura especificada, admitiendo comentarios mediante #:
 ```
-
-Donde:
-
-- `Q`: conjunto de estados.
-- `Σ`: alfabeto de entrada.
-- `Γ`: alfabeto de la pila.
-- `q0`: estado inicial.
-- `A0`: símbolo inicial de la pila.
-- `F`: estados finales.
-- Cada transición tiene el formato:
-
-```text
-estado_actual símbolo_entrada cima_pila estado_destino simbolos_a_apilar
-```
-
-Ejemplo real del proyecto:
-
-```text
-p q r
-0 1
-0 1 S
-p
-S
-r
-p 0 S p 0S
-p 1 S p 1S
-p 0 0 p 00
-p 0 1 p 01
-p 1 0 p 10
-p 1 1 p 11
-p . S q S
-p . 0 q 0
-p . 1 q 1
-q 0 0 q .
-q 1 1 q .
-q . S r S
-```
-
-- `.` representa epsilon.
-- El contenido de `simbolos_a_apilar` puede ser vacío, un símbolo o varios símbolos.
-
-## Formato del archivo de entrada
-
-El archivo de entrada contiene una cadena por línea. Cada símbolo debe pertenecer al alfabeto de entrada del autómata.
-
-Ejemplo:
-
-```text
-0110
-001100
+# Comentarios explicativos
+q1 q2 q3        # Conjunto de estados Q
+a b             # Alfabeto de entrada Sigma
+a b _           # Alfabeto de cinta Gamma (incluyendo el símbolo blanco)
+q1              # Estado inicial s
+_               # Símbolo blanco (b)
+q3              # Estados finales F
+1               # Número de cintas
+q1 a q2 b R     # Transición: delta(q1, a) = (q2, b, R)
 ```
 
 ## Compilación
 
-Desde la raíz del proyecto ejecuta:
-
-```bash
+Para compilar el proyecto y generar el ejecutable main, ejecute desde la raíz del proyecto:
+```
 make
 ```
-
-Esto genera el ejecutable `main`.
+Para limpiar los ficheros objeto generados y el ejecutable:
+```
+make clean
+```
 
 ## Ejecución
-El programa recibe los siguientes argumentos por línea de comandos:
--config <f> :fichero de texto con la configuración del autómata.
--trace <y|n> :activa (y) o desactiva (n) la traza durante la ejecución.
--in <f> :fichero de texto con las cadenas de entrada que se comprobarán.
-```bash
 
-Los tres argumentos son obligatorios.
+El programa acepta las siguientes opciones por línea de comandos:
 
-Ejemplo de ejecución con traza:
+- ```-config <f>```: Fichero de texto con la configuración de la MT (obligatorio).
+- ```-in <f>```: Fichero de texto con las cadenas de entrada a comprobar (opcional).
 
-./main -config automata.txt -trace y -in input.txt
+### Ejemplos de ejecución:
 
-Ejemplo de ejecución sin traza:
+Ejecución con fichero de entradas:
 
-./main -config automata.txt -trace n -in input.txt
-```
-
-- `trace`: usa `y` para activar la traza, o `n` para ejecutarlo sin mostrar el recorrido detallado.
-
-Ejemplo:
-
-```bash
-./main automata.txt y input.txt
-```
-
-## Salida esperada
-
-El programa imprime si cada cadena es aceptada o rechazada. Ejemplo:
-
-```text
-Cadena: 0110 -> Aceptada
-Cadena: 001100 -> Rechazada
-```
-
-Si se activa la traza (`y`), además se muestran los estados, la entrada restante, el contenido de la pila y las transiciones posibles en cada paso.
-
-## Requisitos
-
-- Compilador de C++ con soporte para C++17.
-- `make`.
-
-## Autoría
-
-Proyecto desarrollado para la práctica de complejidad computacional / teoría de autómatas.
+```./main -config automata.txt -in input.txt```
