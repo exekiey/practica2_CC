@@ -1,13 +1,13 @@
-CXX ?= g++
+CXX = g++
 
-CXXFLAGS ?= -std=c++17 -Wall -Wextra -pedantic -g
-CPPFLAGS += -Iinclude
+CXXFLAGS = -std=c++17 -Wall -Wextra -pedantic -g
+CPPFLAGS = -Iinclude
 
-TARGET ?= main
+TARGET = main
 
-SOURCES := $(wildcard *.cpp)
-HEADERS := $(wildcard include/*.h)
-OBJECTS := $(patsubst %.cpp,build/%.o,$(SOURCES))
+SOURCES = $(wildcard *.cpp)
+HEADERS = $(wildcard include/*.h)
+OBJECTS = $(addprefix build/,$(SOURCES:.cpp=.o))
 
 .PHONY: all clean
 
@@ -17,7 +17,7 @@ $(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $@
 
 build/%.o: %.cpp $(HEADERS)
-	mkdir -p $(@D)
+	mkdir -p build
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 clean:

@@ -1,7 +1,7 @@
 #include "solver.h"
 
-Solver::Solver(const Automaton& automaton)
-    : automaton(automaton) {
+Solver::Solver(const TuringMachine& automaton)
+    : turingMachine(automaton) {
 }
 
 bool Solver::Contains(
@@ -16,8 +16,8 @@ bool Solver::Contains(
 
     return false;
 }
-
-void Solver::PrintNode(const Node& node, const std::vector<Symbol>& input, const Automaton& automaton) {
+/*
+void Solver::PrintNode(const Node& node, const std::vector<Symbol>& input, const TuringMachine& automaton) {
     std::cout << "Estado: " << node.state.GetName() << std::endl;
 
     std::cout << "Input: ";
@@ -63,30 +63,7 @@ void Solver::PrintNode(const Node& node, const std::vector<Symbol>& input, const
     }
     std::cout << endl;
 }
-
-void Solver::GenerateEpsilonNodes(Node& currentNode, std::queue<Node>& BFSqueue) {
-    for (const Transition& transition : automaton.transitions) {
-        State transitionedState;
-        std::vector<Symbol> addedSymbols;
-
-        if (transition.MatchEpsilon(currentNode.stack.top(), currentNode.state)) {
-            std::stack<Symbol> stackCopy = currentNode.stack;
-            stackCopy.pop();
-
-            AppendVectorToStack(
-                stackCopy,
-                transition.addedSymbols
-            );
-
-            Node newNode(
-                transition.transitionedState,
-                stackCopy,
-                currentNode.inputCounter
-            );
-            BFSqueue.push(newNode);
-        }
-    }
-}
+*/
 
 void Solver::AppendVectorToStack(
     std::stack<Symbol>& stack,
@@ -97,86 +74,44 @@ void Solver::AppendVectorToStack(
     }
 }
 
-bool Solver::Solve(const std::vector<Symbol>& input, bool doTrace) {
+bool Solver::DoTransitions(vector<Tape>& tapes, State& currentState) {
+    vector<Symbol> symbols;
+    for (Tape currentTape : tapes) {
+        symbols.push_back(currentTape.GetSymbol());
+    }
+    for (const Transition& currentTransition : turingMachine.transitions) {
+        if (currentTransition.Match(symbols, currentState)) {
+
+            for (int i = 0; i < tapes.size(); i++) {
+                tapes[i].Write(currentTransition.addedSymbols[i]);
+                tapes[i].Move(currentTransition.movements[i]);
+            }
+
+            currentState = currentTransition.transitionedState;
+
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Solver::Solve(const std::vector<Symbol>& input, bool doTrace, string* result) {
+    State currentState = turingMachine.initialState;
     
-
-    std::queue<Node> BFSqueue = std::queue<Node>();
-    std::stack<Symbol> initialStack;
-
-    AppendVectorToStack(
-        initialStack,
-        automaton.initialStackSymbols
-    );
-
-    BFSqueue.push(
-        Node(
-            automaton.initialState,
-            initialStack,
-            0
-        )
-    );
-
-    while (!BFSqueue.empty()) {
-        Node currentNode = BFSqueue.front();
-        BFSqueue.pop();
-        if (doTrace) {
-            PrintNode(currentNode, input, automaton);
-        }
-        int inputCounter = currentNode.inputCounter;
-        std::stack<Symbol> stack = currentNode.stack;
-
-        if (stack.empty()) {
-            continue;
-        }
-        
-        if (inputCounter == input.size()) {
-            if (Contains(automaton.finalStates, currentNode.state)) {
-                return true;
-            }
-            GenerateEpsilonNodes(currentNode, BFSqueue);
-            continue;
-        }
-
-        Symbol currentInputSymbol = input[inputCounter];
-
-        Symbol currentStackSymbol = stack.top();
-
-        for (const Transition& transition : automaton.transitions) {
-
-            if (transition.Match(currentInputSymbol, currentStackSymbol, currentNode.state)) {
-                std::stack<Symbol> stackCopy = stack;
-                stackCopy.pop();
-
-                AppendVectorToStack(
-                    stackCopy,
-                    transition.addedSymbols
-                );
-
-                Node newNode(
-                    transition.transitionedState,
-                    stackCopy,
-                    inputCounter + 1
-                );
-                BFSqueue.push(newNode);
-            }
-            if (transition.MatchEpsilon(currentStackSymbol, currentNode.state)) {
-                std::stack<Symbol> stackCopy = stack;
-                stackCopy.pop();
-
-                AppendVectorToStack(
-                    stackCopy,
-                    transition.addedSymbols
-                );
-
-                Node newNode(
-                    transition.transitionedState,
-                    stackCopy,
-                    inputCounter
-                );
-                BFSqueue.push(newNode);
-            }
+    vector<Tape> tapes;
+    tapes.push_back(Tape(input));
+    for (int _ = 1; _ < turingMachine.numberOfTapes; _++) {
+        tapes.push_back(Tape(vector<Symbol>{}));
+    }
+    
+    
+    while (!Contains(turingMachine.finalStates, currentState)) {
+        if (!DoTransitions(tapes, currentState)) {
+            *result = tapes[0].ToString();
+            return false;
         }
     }
 
-    return false;
+    *result = tapes[0].ToString();
+    return true;
 }

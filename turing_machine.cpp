@@ -1,21 +1,21 @@
-#include "automaton.h"
+#include "turing_machine.h"
 
 #include <set>
 #include <vector>
 
-Automaton::Automaton(
+TuringMachine::TuringMachine(
     const std::set<Symbol>& inputSymbols,
-    const std::set<Symbol>& stackSymbols,
+    const std::set<Symbol>& tapeSymbols,
     const std::set<State>& states,
     State initialState,
-    const std::vector<Symbol>& initialStackSymbols,
     const std::set<State>& finalStates,
+    const int numberOfTapes,
     const std::set<Transition>& transitions
 ) :
     inputSymbols(inputSymbols),
-    stackSymbols(stackSymbols),
+    tapeSymbols(tapeSymbols),
     states(states),
     initialState(initialState),
-    initialStackSymbols(initialStackSymbols),
     finalStates(finalStates),
+    numberOfTapes(numberOfTapes),
     transitions(transitions) {}

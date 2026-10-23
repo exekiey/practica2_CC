@@ -5,17 +5,19 @@
 
 #include "state.h"
 #include "symbol.h"
+#include "movement.h"
 
 struct Transition {
 	State currentState;
-	Symbol inputSymbol;
-	Symbol stackTop;
+	vector<Symbol> inputSymbols;
 	State transitionedState;
-	std::vector<Symbol> addedSymbols;
+    vector<Symbol> addedSymbols;
+	vector<Movement> movements;
 
 	bool operator<(const Transition& other) const;
-    bool MatchEpsilon(Symbol stackSymbol, State currentState) const;
-    bool Match(Symbol inputSymbol, Symbol stackSymbol, State currentState) const;
+    bool MatchEmpty(State currentState) const;
+    bool Match(vector<Symbol> inputSymbol, State currentState) const;
+    void Print() const;
 };
 
 #endif

@@ -82,7 +82,7 @@ bool ReadOptions(
     return true;
 }
 
-void PrintAutomaton(Automaton& automaton) {
+void PrintMachine(TuringMachine& automaton) {
     cout << "Estados:";
     for (const State& state : automaton.states) {
         cout << " " << state.GetName();
@@ -95,16 +95,13 @@ void PrintAutomaton(Automaton& automaton) {
     }
     cout << endl;
 
-    cout << "Símbolos de pila:";
-    for (const Symbol& symbol : automaton.stackSymbols) {
+    cout << "Símbolos de cinta:";
+    for (const Symbol& symbol : automaton.tapeSymbols) {
         cout << " " << symbol.GetName();
     }
     cout << endl;
 
     cout << "Estado inicial: " << automaton.initialState.GetName() << endl;
-
-    cout << "Símbolo inicial de pila: "
-         << automaton.initialStackSymbols.front().GetName() << endl;
 
     cout << "Estados finales:";
     for (const State& state : automaton.finalStates) {
@@ -113,16 +110,7 @@ void PrintAutomaton(Automaton& automaton) {
     cout << endl;
 
     for (const Transition& transition : automaton.transitions) {
-        cout << "Transición: (" << transition.currentState.GetName() << ", "
-             << transition.inputSymbol.GetName() << ", "
-             << transition.stackTop.GetName() << ") -> ("
-             << transition.transitionedState.GetName() << ", [";
-
-        for (const Symbol& symbol : transition.addedSymbols) {
-            cout << symbol.GetName();
-        }
-
-        cout << "])" << endl;
+        transition.Print();
     }
 }
 
@@ -137,32 +125,32 @@ int main(int argc, char* argv[]) {
 
     Reader reader(configFile, inputFile);
 
-    if (!reader.ReadAutomaton()) {
-        cerr << "Error al leer el archivo del autómata." << endl;
+    if (!reader.ReadMachine()) {
+        cerr << "Error al leer el archivo de la máquina de Turing." << endl;
         return 1;
     }
 
-    Automaton automaton = reader.GetAutomaton();
+    TuringMachine turingMachine = reader.GetTuringMachine();
 
     if (doTrace) {
-        PrintAutomaton(automaton);
+        PrintMachine(turingMachine);
     }
 
     vector<vector<Symbol>> inputSymbolsList;
-    reader.ReadInputFile(automaton.inputSymbols, inputSymbolsList);
+    if (!reader.ReadInputFile(turingMachine.inputSymbols, inputSymbolsList)) {
+        cerr << "Error al leer el archivo de entrada." << endl;
+        return 1;
+    }
 
-    Solver solver(automaton);
-
-    for (const auto& symbols : inputSymbolsList) {
-        bool accepted = solver.Solve(symbols, doTrace);
-
-        cout << "Cadena: ";
-
-        for (const Symbol& symbol : symbols) {
+    Solver solver = Solver(turingMachine);
+    for (vector<Symbol> symbolList : inputSymbolsList) {
+        for (Symbol symbol : symbolList) {
             cout << symbol.GetName();
         }
-
-        cout << " -> " << (accepted ? "Aceptada" : "Rechazada") << endl;
+        string result;
+        cout << (solver.Solve(symbolList, doTrace, &result) ? "Válida" : "Inválida");
+        cout << result;
+        cout << endl;
     }
 
     return 0;

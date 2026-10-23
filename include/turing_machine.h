@@ -8,22 +8,22 @@
 #include <set>
 #include <vector>
 
-struct Automaton {
+struct TuringMachine {
     std::set<Symbol> inputSymbols;
-    std::set<Symbol> stackSymbols;
+    std::set<Symbol> tapeSymbols;
     std::set<State> states;
     State initialState;
-    std::vector<Symbol> initialStackSymbols;
     std::set<State> finalStates;
+    int numberOfTapes;
     std::set<Transition> transitions;
 
-    Automaton(
+    TuringMachine(
         const std::set<Symbol>& inputSymbols,
-        const std::set<Symbol>& stackSymbols,
+        const std::set<Symbol>& tapeSymbols,
         const std::set<State>& states,
         State initialState,
-        const std::vector<Symbol>& initialStackSymbols,
         const std::set<State>& finalStates,
+        const int numberOfTapes,
         const std::set<Transition>& transitions
     );
 };

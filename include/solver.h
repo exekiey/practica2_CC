@@ -5,11 +5,12 @@
 #include <stack>
 #include <vector>
 
-#include "automaton.h"
+#include "turing_machine.h"
 #include "node.h"
 #include "state.h"
 #include "symbol.h"
 #include "transition.h"
+#include "tape.h"
 
 struct StateAndAddedSymbols {
     State state;
@@ -20,7 +21,7 @@ struct StateAndAddedSymbols {
 
 class Solver {
 private:
-    Automaton automaton;
+    TuringMachine turingMachine;
 
     bool Contains(const std::set<State>& values, const State& value) const;
 
@@ -34,12 +35,16 @@ private:
         std::stack<Symbol>& stack,
         const std::vector<Symbol>& symbols
     );
-    void PrintNode(const Node& node, const std::vector<Symbol>& input, const Automaton& automaton);
+    void PrintNode(const Node& node, const std::vector<Symbol>& input, const TuringMachine& automaton);
+
+    bool MatchTransition(Transition transition, Transition otherTransition);
+
+    bool DoTransitions(vector<Tape>& tape, State& currentState);
 
 public:
-    Solver(const Automaton& automaton);
+    Solver(const TuringMachine& automaton);
 
-    bool Solve(const std::vector<Symbol>& input, bool doTrace);
+    bool Solve(const std::vector<Symbol>& input, bool doTrace, string* string);
     void GenerateEpsilonNodes(Node& currentNode, std::queue<Node>& BFSqueue);
 };
 

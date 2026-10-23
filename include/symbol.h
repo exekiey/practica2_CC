@@ -7,13 +7,13 @@ class Symbol {
 private:
     std::string name;
     
-    static Symbol epsilon;
 public:
+    static Symbol emptySymbol;
     Symbol(const string& name);
     Symbol();
     string GetName() const;
     bool operator<(const Symbol& other) const;
     bool operator==(const Symbol& other) const;
-    bool IsEpsilon() const;
-    static void SetEpsilon(const string& epsilonName);
+    bool IsEmptySymbol() const;
+    static void SetEmptySymbol(const string& epsilonName);
 };

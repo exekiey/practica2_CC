@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Symbol Symbol::epsilon;
+Symbol Symbol::emptySymbol;
 
 Symbol::Symbol(const std::string& name) : name(name) {}
 Symbol::Symbol(){};
@@ -14,9 +14,9 @@ bool Symbol::operator<(const Symbol& other) const {
 bool Symbol::operator==(const Symbol& other) const {
   return name == other.name;
 }
-bool Symbol::IsEpsilon() const {
-  return *this == Symbol::epsilon;
+bool Symbol::IsEmptySymbol() const {
+  return *this == Symbol::emptySymbol;
 }
-void Symbol::SetEpsilon(const string& epsilonName) {
-    epsilon = Symbol(epsilonName);
+void Symbol::SetEmptySymbol(const string& epsilonName) {
+    emptySymbol = Symbol(epsilonName);
 }
